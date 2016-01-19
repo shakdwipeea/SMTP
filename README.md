@@ -1,3 +1,5 @@
+## SMTP Sample
+
 ## Runnning Instructions
 Import Maven depenencies  
 Add username and password in Mailer.java  
