@@ -1,4 +1,4 @@
-package io.github.shakdwipeea;
+package com.shakdwipeea.smtp;
 
 /**
  * Created by akash on 17/1/16.

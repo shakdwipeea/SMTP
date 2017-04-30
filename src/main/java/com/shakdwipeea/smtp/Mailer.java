@@ -1,4 +1,4 @@
-package io.github.shakdwipeea;
+package com.shakdwipeea.smtp;
 
 import javax.activation.*;
 import javax.mail.*;
