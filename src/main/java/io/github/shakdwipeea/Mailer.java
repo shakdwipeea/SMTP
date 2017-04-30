@@ -12,10 +12,17 @@ import java.util.*;
  * Created by akash on 17/1/16.
  */
 public class Mailer {
-    //todo add your username
-    final private static String username = "";
-    //todo add your password
-    final private static String password = "";
+    private String username = "";
+    private String password = "";
+
+    public Mailer(String username, String password) {
+        this.username = username;
+        this.password = password;
+    }
+
+    public void sendEmail(String receiver, String body, String subject) {
+        sendEmail(receiver, body, subject, null);
+    }
 
     /**
      *
@@ -24,7 +31,7 @@ public class Mailer {
      * @param subject Subject of the email
      * @param fileNames FileNames to be added as attachment. Must be full paths
      */
-    public static void sendEmail(String receiver, String body, String subject, ArrayList<String> fileNames) {
+    public void sendEmail(String receiver, String body, String subject, ArrayList<String> fileNames) {
         Properties props = new Properties();
         props.put("mail.smtp.auth", "true");
         props.put("mail.smtp.starttls.enable", "true");
@@ -39,17 +46,7 @@ public class Mailer {
                 });
 
         try {
-
-            /**
-             * For attachments
-             */
-            MailcapCommandMap mc = (MailcapCommandMap) CommandMap.getDefaultCommandMap();
-            mc.addMailcap("text/html;; x-java-content-handler=com.sun.mail.handlers.text_html");
-            mc.addMailcap("text/xml;; x-java-content-handler=com.sun.mail.handlers.text_xml");
-            mc.addMailcap("text/plain;; x-java-content-handler=com.sun.mail.handlers.text_plain");
-            mc.addMailcap("multipart/*;; x-java-content-handler=com.sun.mail.handlers.multipart_mixed");
-            mc.addMailcap("message/rfc822;; x-java-content- handler=com.sun.mail.handlers.message_rfc822");
-
+            setupMultipart();
 
             /**
              * Prepare the message
@@ -72,9 +69,12 @@ public class Mailer {
             // Set text message part
             multipart.addBodyPart(messageBodyPart);
 
-            // Part two is attachment
-            for (String fileName : fileNames) {
-                multipart.addBodyPart(addAttachments(fileName));
+            // Add attachments if available
+            if (fileNames != null) {
+                // Part two is attachment
+                for (String fileName : fileNames) {
+                    multipart.addBodyPart(addAttachments(fileName));
+                }
             }
 
             // Send the complete message parts
@@ -90,13 +90,22 @@ public class Mailer {
         }
     }
 
+    private void setupMultipart() {
+        MailcapCommandMap mc = (MailcapCommandMap) CommandMap.getDefaultCommandMap();
+        mc.addMailcap("text/html;; x-java-content-handler=com.sun.mail.handlers.text_html");
+        mc.addMailcap("text/xml;; x-java-content-handler=com.sun.mail.handlers.text_xml");
+        mc.addMailcap("text/plain;; x-java-content-handler=com.sun.mail.handlers.text_plain");
+        mc.addMailcap("multipart/*;; x-java-content-handler=com.sun.mail.handlers.multipart_mixed");
+        mc.addMailcap("message/rfc822;; x-java-content- handler=com.sun.mail.handlers.message_rfc822");
+    }
+
     /**
      *
      * @param fileName File to be added as attachment
      * @return MimeBodyPart to be added in multipart message
      * @throws MessagingException
      */
-    private static MimeBodyPart addAttachments(String fileName) throws MessagingException {
+    private MimeBodyPart addAttachments(String fileName) throws MessagingException {
         MimeBodyPart messageBodyPart = new MimeBodyPart();
         DataSource dataSource = new FileDataSource(fileName);
         messageBodyPart.setDataHandler(new DataHandler(dataSource));
